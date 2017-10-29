@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:ctx="http://www.springframework.org/schema/context"
+    xmlns:cxf="http://camel.apache.org/schema/cxf"
+    xmlns:cxfcore="http://cxf.apache.org/core"
+    xmlns:http-conf="http://cxf.apache.org/transports/http/configuration"
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+    xmlns:osgi="http://www.springframework.org/schema/osgi"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd        http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd        http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+    <bean class="com.eai.rs.transform.FizzBuzzResponseTransformer" id="fizzBuzzResponseTransformer"/>
+    <bean class="com.eai.rs.service.FizzBuzzServiceImpl" id="serviceClass"/>
+    <cxf:rsServer address="http://localhost:9090/cxfrestservice" id="endpoint">
+        <cxf:serviceBeans>
+            <ref bean="serviceClass"/>
+        </cxf:serviceBeans>
+    </cxf:rsServer>
+    <camelContext id="camelContext-204affca-8477-4d10-9c0f-1d310fa52f65" xmlns="http://camel.apache.org/schema/spring">
+        <route id="_route1">
+            <from id="_from1" uri="cxfrs:bean:endpoint"/>
+            <log id="_log1" message="Befor calling service, the message is ${body}"/>
+            <to id="_to1" uri="direct:serviceClass"/>
+        </route>
+        <route id="_route2">
+            <from id="_from2" uri="direct:serviceClass"/>
+            <bean id="_bean1" method="responseMapper" ref="fizzBuzzResponseTransformer"/>
+            <log id="_log2" message="After calling service, the message is ${body}"/>
+        </route>
+    </camelContext>
+</beans>
